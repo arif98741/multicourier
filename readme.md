@@ -1,11 +1,5 @@
-Xenon\LaravelBDSms is a sms gateway package for sending text message to Bangladeshi mobile numbers using several
-gateways for <strong>Laravel</strong>. You should use <strong>composer 2</strong> for latest updates of this package.
+This is a courier api endpoints library for interacting such as e-courier, dhl, pathao etc
 
-<p><img src="https://img.shields.io/github/issues/arif98741/laravelbdsms">
-<img src="https://img.shields.io/github/forks/arif98741/laravelbdsms">
-<img src="https://img.shields.io/github/stars/arif98741/laravelbdsms">
-   <img src="https://img.shields.io/github/license/arif98741/laravelbdsms">
-</p>
 
 # Installation
 
