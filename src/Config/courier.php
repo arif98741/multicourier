@@ -42,6 +42,14 @@ return [
                     'method' => 'post',
                     'params' => ['city']
                 ],
+                'payment-status' => [
+                    'method' => 'post',
+                    'params' => []
+                ],
+                'packages' => [
+                    'method' => 'post',
+                    'params' => []
+                ],
                 'order-place' => [
                     'method' => 'post',
                     'params' => [

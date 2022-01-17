@@ -43,6 +43,8 @@ class Sender
      */
     private $params;
 
+    public $environment;
+
     /**
      * @var
      */
@@ -148,6 +150,7 @@ class Sender
         // $config = Config::get('sms');
         //dd($config);
         // $this->logGenerate($config, $response);
+
         return $this->provider->sendRequest($this->getRequestEndpoint());
     }
 
@@ -202,11 +205,12 @@ class Sender
     /**
      * Return this class object
      * @param $ProviderClass
+     * @param string|null $environment
      * @return Sender
      * @throws RenderException
      * @since v1.0.0
      */
-    public function setProvider($ProviderClass): Sender
+    public function setProvider($ProviderClass, string $environment = null): Sender
     {
 
         try {
@@ -217,6 +221,8 @@ class Sender
             if (!is_subclass_of($ProviderClass, AbstractProvider::class)) {
                 throw new RenderException("Provider '$ProviderClass' is not a " . AbstractProvider::class);
             }
+
+            $this->environment = $environment;
         } catch (XenonException $exception) {
 
             $exception->showException($ProviderClass);

@@ -13,6 +13,7 @@ namespace Xenon\MultiCourier\Provider;
 
 use GuzzleHttp\Exception\GuzzleException;
 use Xenon\MultiCourier\Handler\ParameterException;
+use Xenon\MultiCourier\Handler\RequestException;
 use Xenon\MultiCourier\Request;
 use Xenon\MultiCourier\Sender;
 
@@ -23,11 +24,6 @@ class ECourier extends AbstractProvider
      */
     private $base_url = 'https://staging.ecourier.com.bd/api/';
 
-    /**
-     * @var
-     */
-    private $environment = 'local';
-
 
     /**
      * ECourier constructor.
@@ -37,7 +33,9 @@ class ECourier extends AbstractProvider
     public function __construct(Sender $sender, string $environment = 'local')
     {
         $this->senderObject = $sender;
-        if ($environment != 'local') {
+
+
+        if ($this->senderObject->environment == 'production') {
             $this->setBaseUrl('https://backoffice.ecourier.com.bd/api/');
         }
     }
@@ -45,7 +43,7 @@ class ECourier extends AbstractProvider
     /**
      * Send Request To Api and Send Message
      * @throws GuzzleException
-     * @throws ParameterException
+     * @throws ParameterException|RequestException
      */
     public function sendRequest()
     {
@@ -53,42 +51,14 @@ class ECourier extends AbstractProvider
         $config = $this->senderObject->getConfig();
 
         $providerConfiguration = config('courier')['providers'][get_class($this)];
-        $endpointData = $providerConfiguration['endpoints'][$endpoint];
 
         if (!array_key_exists($endpoint, $providerConfiguration['endpoints'])) {
             throw new ParameterException("Endpoint $endpoint doesn't exist for " . self::class);
         }
 
-
-        $request = new Request($this->getBaseUrl(), $endpoint, $endpointData['method'], $this->senderObject->getParams());
-        $x = $request->executeRequest();
-
-
-
-        // dd($providerConfiguration['endpoints'][$endpoint]);
-
-        //Request::
-
-        /*$client = new Client([
-            'base_uri' => $this->getBaseUrl(),
-            'timeout' => 10.0,
-            'verify' => false,
-        ]);
-
-        $response = $client->request('POST', $endpoint, [
-            'query' => $this->senderObject->getParams(),
-            'headers' => [
-                'API-KEY' => $config['API-KEY'],
-                'API-SECRET' => $config['API-SECRET'],
-                'USER-ID' => $config['USER-ID'],
-            ]
-        ]);
-        $body = $response->getBody();
-        $responseResult = $body->getContents();
-        dd($responseResult);
-
-        $report = $this->generateReport($responseResult, []);
-        return $report->getContent();*/
+        $endpointData = $providerConfiguration['endpoints'][$endpoint];
+        $request = new Request($this->getBaseUrl(), $endpoint, $endpointData['method'], $config, $this->senderObject->getParams());
+        return $request->executeRequest();
     }
 
     /**

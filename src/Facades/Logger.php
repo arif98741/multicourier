@@ -24,6 +24,6 @@ class Logger extends Facade
      */
     protected static function getFacadeAccessor(): string
     {
-        return 'LaravelBDSmsLogger';
+        return 'MultiCourierLogger';
     }
 }

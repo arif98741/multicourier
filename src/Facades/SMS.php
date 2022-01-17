@@ -17,6 +17,6 @@ class SMS extends Facade
      */
     protected static function getFacadeAccessor(): string
     {
-        return 'LaravelBDSms';
+        return 'MultiCourier';
     }
 }

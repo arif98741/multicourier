@@ -39,7 +39,7 @@ class MultiCourierServiceProvider extends ServiceProvider
             return new Log;
         });
 
-        $this->app->bind('LaravelBDSmsRequest', function () {
+        $this->app->bind('MultiCourierRequest', function () {
             return new Request;
         });
 
