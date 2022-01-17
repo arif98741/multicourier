@@ -6,7 +6,7 @@ This is a courier api endpoints library for interacting such as e-courier, dhl, 
 ### Step 1:
 
 ```
-composer require xenon/laravelbdsms
+composer require xenon/multicourier
 ```
 
 ### Step 2:
