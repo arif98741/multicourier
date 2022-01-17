@@ -25,7 +25,7 @@ class MultiCourierServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('LaravelBDSms', function () {
+        $this->app->bind('MultiCourier', function () {
 
             $provider = config('sms.default_provider');
 
@@ -35,7 +35,7 @@ class MultiCourierServiceProvider extends ServiceProvider
             return new SMS($sender);
         });
 
-        $this->app->bind('LaravelBDSmsLogger', function () {
+        $this->app->bind('MultiCourierLogger', function () {
             return new Log;
         });
 
@@ -59,15 +59,6 @@ class MultiCourierServiceProvider extends ServiceProvider
         ]);
 
 
-        if ($this->app->runningInConsole())
-
-            if (!class_exists('CreateLaravelbdSmsTable')) {
-
-                $this->publishes([
-                    __DIR__ . '/Database/migrations/create_laravelbd_sms_table.php.stub' => database_path('migrations/' . date('Y_m_d_His', time()) . '_create_laravelbd_sms_table.php'),
-
-                ], 'migrations');
-            }
     }
 
 }
