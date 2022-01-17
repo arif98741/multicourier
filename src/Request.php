@@ -3,6 +3,7 @@
 namespace Xenon\MultiCourier;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use Xenon\MultiCourier\Handler\RequestException;
@@ -62,7 +63,7 @@ class Request
      * @throws GuzzleException
      * @throws RequestException
      */
-    private function get($requestUrl, array $query, bool $verify = false, $timeout = 10.0)
+    private function get($requestUrl, array $query = [], bool $verify = false, $timeout = 10.0)
     {
         $client = new Client([
             'base_uri' => $this->base_url,
@@ -87,7 +88,7 @@ class Request
      * @throws GuzzleException
      * @throws RequestException
      */
-    private function post($requestUrl, array $query, bool $verify = false, $timeout = 10.0)
+    private function post($requestUrl, array $query = null, bool $verify = false, $timeout = 10.0)
     {
         $client = new Client([
             'base_uri' => $requestUrl,
@@ -100,10 +101,9 @@ class Request
                 'verify' => $verify,
                 'headers' => $this->headers
             ]);
-        } catch (ConnectException $e) {
+        } catch (ConnectException|ClientException $e) {
             throw new RequestException($e->getMessage());
         }
-
 
     }
 
@@ -114,6 +114,7 @@ class Request
     public function executeRequest()
     {
         $requestUrl = $this->base_url . $this->endpoint;
+       
         if ($this->method == 'post') {
             $requestObject = $this->post($requestUrl, $this->params);
         } else {
@@ -134,14 +135,13 @@ class Request
         return $this->response;
     }
 
-     /**
+    /**
      * @return mixed
      */
     public function getStatusCode()
     {
         return $this->getStatusCode();
     }
-
 
 
 }

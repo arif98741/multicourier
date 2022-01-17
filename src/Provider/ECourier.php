@@ -24,7 +24,10 @@ class ECourier extends AbstractProvider
      * @var string
      */
     private $base_url = 'https://staging.ecourier.com.bd/api/';
-
+    /**
+     * @var mixed|string
+     */
+    private $environment;
 
     /**
      * ECourier constructor.
@@ -34,7 +37,6 @@ class ECourier extends AbstractProvider
     public function __construct(Sender $sender, string $environment = 'local')
     {
         $this->senderObject = $sender;
-
 
         if ($this->senderObject->environment == 'production') {
             $this->setBaseUrl('https://backoffice.ecourier.com.bd/api/');
