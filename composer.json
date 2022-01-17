@@ -1,6 +1,6 @@
 {
-    "name": "xenon/laravelbdsms",
-    "description": "This is package for sending sms to Bangladeshi mobile numbers using laravel application",
+    "name": "xenon/multicourier",
+    "description": "This is a courier api endpoints library for interacting such as e-courier, dhl, pathao etc",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -25,7 +25,7 @@
             "aliases": {
                 "Courier": "Xenon\\MultiCourier\\Facades\\SMS",
                 "MultiCourier": "Xenon\\MultiCourier\\Facades\\SMS",
-                "LaravelBDSmsLogger": "Xenon\\LaravelBDSms\\Facades\\Logger"
+                "LaravelBDSmsLogger": "Xenon\\MultiCourier\\Facades\\Logger"
             }
         }
     }
