@@ -13,6 +13,7 @@ namespace Xenon\MultiCourier\Provider;
 
 use GuzzleHttp\Exception\GuzzleException;
 use Xenon\MultiCourier\Handler\ParameterException;
+use Xenon\MultiCourier\Handler\RenderException;
 use Xenon\MultiCourier\Handler\RequestException;
 use Xenon\MultiCourier\Request;
 use Xenon\MultiCourier\Sender;
@@ -44,11 +45,16 @@ class ECourier extends AbstractProvider
      * Send Request To Api and Send Message
      * @throws GuzzleException
      * @throws ParameterException|RequestException
+     * @throws RenderException
      */
     public function sendRequest()
     {
         $endpoint = $this->senderObject->getRequestEndpoint();
         $config = $this->senderObject->getConfig();
+        $courierConfig = config('courier');
+        if ($courierConfig == null) {
+            throw new RenderException("No courier.php file exist inside config directory. You should publish vendor Xenon\MultiCourier\MultiCourierServiceProvider");
+        }
 
         $providerConfiguration = config('courier')['providers'][get_class($this)];
 
