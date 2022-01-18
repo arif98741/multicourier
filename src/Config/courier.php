@@ -50,11 +50,32 @@ return [
                     'method' => 'post',
                     'params' => []
                 ],
+                'postcode-list' => [
+                    'method' => 'post',
+                    'params' => ['city', 'thana']
+                ],
+                'branch-list' => [
+                    'method' => 'post',
+                    'params' => ['city', 'thana']
+                ],
                 'order-place' => [
                     'method' => 'post',
                     'params' => [
                     ]
                 ],
+                'cancel-order' => [
+                    'method' => 'post',
+                    'params' => ['tracking', 'comment']
+                ],
+                'track' => [
+                    'method' => 'post',
+                    'params' => ['Product_id', 'ecr']
+                ],
+                'fraud-status-check' => [
+                    'method' => 'post',
+                    'params' => ['number']
+                ],
+
             ]
         ],
 
