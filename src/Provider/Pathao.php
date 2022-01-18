@@ -18,12 +18,12 @@ use Xenon\MultiCourier\Handler\RenderException;
 use Xenon\MultiCourier\Handler\RequestException;
 use Xenon\MultiCourier\Request;
 
-class ECourier extends AbstractProvider
+class Pathao extends AbstractProvider
 {
     /**
      * @var string
      */
-    private $base_url = 'https://staging.ecourier.com.bd/api/';
+    private $base_url = 'http://hermes-api.p-stageenv.xyz/aladdin/api/v1';
     /**
      * @var mixed|string
      */
@@ -31,15 +31,15 @@ class ECourier extends AbstractProvider
 
     /**
      * ECourier constructor.
-     * @param Courier $courier
+     * @param Courier $sender
      * @param string $environment
      */
-    public function __construct(Courier $courier, string $environment = 'local')
+    public function __construct(Courier $sender, string $environment = 'local')
     {
-        $this->senderObject = $courier;
+        $this->senderObject = $sender;
 
         if ($this->senderObject->environment == 'production') {
-            $this->setBaseUrl('https://backoffice.ecourier.com.bd/api/');
+            $this->setBaseUrl('https://api-hermes.pathaointernal.com/aladdin/api/v1');
         }
     }
 
@@ -106,17 +106,27 @@ class ECourier extends AbstractProvider
      */
     public function errorException()
     {
-        if (!array_key_exists('API-KEY', $this->senderObject->getConfig())) {
-            throw new ParameterException('API-KEY key is absent in configuration');
+        if (!array_key_exists('client_id', $this->senderObject->getConfig())) {
+            throw new ParameterException('client_id key is absent in configuration');
         }
 
-        if (!array_key_exists('API-SECRET', $this->senderObject->getConfig())) {
-            throw new ParameterException('API-SECRET key is absent in configuration');
+        if (!array_key_exists('client_secret', $this->senderObject->getConfig())) {
+            throw new ParameterException('client_secret key is absent in configuration');
         }
 
-        if (!array_key_exists('USER-ID', $this->senderObject->getConfig())) {
-            throw new ParameterException('USER-ID key is absent in configuration');
+
+        if (!array_key_exists('username', $this->senderObject->getConfig())) {
+            throw new ParameterException('username key is absent in configuration');
         }
+
+        if (!array_key_exists('password', $this->senderObject->getConfig())) {
+            throw new ParameterException('password key is absent in configuration');
+        }
+
+        if (!array_key_exists('grant_type', $this->senderObject->getConfig())) {
+            throw new ParameterException('grant_type key is absent in configuration');
+        }
+
 
     }
 }

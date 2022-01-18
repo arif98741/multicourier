@@ -15,6 +15,7 @@
 */
 
 use Xenon\MultiCourier\Provider\ECourier;
+use Xenon\MultiCourier\Provider\Pathao;
 
 return [
     /*
@@ -38,17 +39,17 @@ return [
             'API-SECRET' => env('ECOURIER_API-SECRET', ''),
             'USER-ID' => env('ECOURIER_USER-ID', ''),
             'endpoints' => [
+                'city-list' => [
+                    'method' => 'post',
+                    'params' => ['city']
+                ],
                 'thana-list' => [
                     'method' => 'post',
                     'params' => ['city']
                 ],
-                'payment-status' => [
+                'area-list' => [
                     'method' => 'post',
-                    'params' => []
-                ],
-                'packages' => [
-                    'method' => 'post',
-                    'params' => []
+                    'params' => ['postcode']
                 ],
                 'postcode-list' => [
                     'method' => 'post',
@@ -57,6 +58,14 @@ return [
                 'branch-list' => [
                     'method' => 'post',
                     'params' => ['city', 'thana']
+                ],
+                'payment-status' => [
+                    'method' => 'post',
+                    'params' => []
+                ],
+                'packages' => [
+                    'method' => 'post',
+                    'params' => []
                 ],
                 'order-place' => [
                     'method' => 'post',
@@ -78,7 +87,20 @@ return [
 
             ]
         ],
+        Pathao::class => [
+            'PATHAO_CLIENT_ID' => env('PATHAO_CLIENT_ID', ''),
+            'PATHAO_CLIENT_SECRET' => env('PATHAO_CLIENT_SECRET', ''),
+            'PATHAO_USERNAME' => env('PATHAO_USERNAME', ''),
+            'PATHAO_PASSWORD' => env('PATHAO_PASSWORD', ''),
+            'PATHAO_GRANT_TYPE' => env('PATHAO_GRANT_TYPE', ''),
+            'endpoints' => [
+                'stores' => [
+                    'method' => 'get',
+                    'params' => []
+                ],
 
+            ]
+        ],
     ]
 ];
 
