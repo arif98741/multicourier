@@ -25,19 +25,19 @@ service provider.
 
 <pre>
 use Xenon\MultiCourier\Provider\ECourier;
-use Xenon\MultiCourier\Sender;
+use Xenon\MultiCourier\Courier;
 
 
-$sender = Sender::getInstance();
-        $sender->setProvider(ECourier::class,'production');
-        $sender->setConfig([
-            'API-KEY' => 'XXX',
-            'API-SECRET' => 'XXX',
-            'USER-ID' => 'XXXX',
-        ]);
-        $sender->setRequestEndpoint('packages', ['city' => 'Tangail']);
-        $response = $sender->send();
-        echo $response->getData();
+$courier = Courier::getInstance();
+$courier->setProvider(ECourier::class,'production');
+$courier->setConfig([
+	'API-KEY' => 'XXX',
+	'API-SECRET' => 'XXX',
+	'USER-ID' => 'XXXX',
+]);
+$courier->setRequestEndpoint('packages', ['city' => 'Tangail']);
+$response = $courier->send();
+echo $response->getData();
 </pre>
 
 

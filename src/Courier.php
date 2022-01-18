@@ -19,7 +19,7 @@ use Xenon\MultiCourier\Handler\RenderException;
 use Xenon\MultiCourier\Handler\RequestException;
 use Xenon\MultiCourier\Provider\AbstractProvider;
 
-class Sender
+class Courier
 {
     /**
      * @var AbstractProvider
@@ -81,10 +81,10 @@ class Sender
      * This implementation lets you subclass the Singleton class while keeping
      * just one instance of each subclass around.
      */
-    public static function getInstance(): Sender
+    public static function getInstance(): Courier
     {
         if (!isset(self::$instance)) {
-            self::$instance = new Sender();
+            self::$instance = new Courier();
         }
 
         return self::$instance;
@@ -100,11 +100,11 @@ class Sender
 
     /**
      * @param mixed $config
-     * @return Sender
+     * @return Courier
      * @throws Exception
      * @since v1.0.0
      */
-    public function setConfig($config): Sender
+    public function setConfig($config): Courier
     {
         $this->config = $config;
         return $this;
@@ -183,10 +183,10 @@ class Sender
 
     /**
      * @param mixed $message
-     * @return Sender
+     * @return Courier
      * @since v1.0.0
      */
-    public function setMessage($message = ''): Sender
+    public function setMessage($message = ''): Courier
     {
 
         $this->message = $message;
@@ -206,11 +206,11 @@ class Sender
      * Return this class object
      * @param $ProviderClass
      * @param string|null $environment
-     * @return Sender
+     * @return Courier
      * @throws RenderException
      * @since v1.0.0
      */
-    public function setProvider($ProviderClass, string $environment = null): Sender
+    public function setProvider($ProviderClass, string $environment = null): Courier
     {
 
         try {

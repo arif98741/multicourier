@@ -4,15 +4,15 @@ use Exception;
 
 class SMS
 {
-    /** @var Sender */
+    /** @var Courier */
     private $sender;
 
     /**
-     * @param Sender $sender
+     * @param Courier $sender
      * @version v1.0.32
      * @since v1.0.31
      */
-    public function __construct(Sender $sender)
+    public function __construct(Courier $sender)
     {
         $this->sender = $sender;
     }

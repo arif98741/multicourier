@@ -16,7 +16,7 @@ use Xenon\MultiCourier\Handler\ParameterException;
 use Xenon\MultiCourier\Handler\RenderException;
 use Xenon\MultiCourier\Handler\RequestException;
 use Xenon\MultiCourier\Request;
-use Xenon\MultiCourier\Sender;
+use Xenon\MultiCourier\Courier;
 
 class ECourier extends AbstractProvider
 {
@@ -31,10 +31,10 @@ class ECourier extends AbstractProvider
 
     /**
      * ECourier constructor.
-     * @param Sender $sender
+     * @param Courier $sender
      * @param string $environment
      */
-    public function __construct(Sender $sender, string $environment = 'local')
+    public function __construct(Courier $sender, string $environment = 'local')
     {
         $this->senderObject = $sender;
 

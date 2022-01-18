@@ -29,7 +29,7 @@ class MultiCourierServiceProvider extends ServiceProvider
 
             $provider = config('sms.default_provider');
 
-            $sender = Sender::getInstance();
+            $sender = Courier::getInstance();
             $sender->setProvider($provider);
             $sender->setConfig(config('sms.providers')[$provider]);
             return new SMS($sender);
