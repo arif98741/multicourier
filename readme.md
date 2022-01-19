@@ -17,10 +17,11 @@ Then, publish the package
 php artisan vendor:publish --provider=Xenon\MultiCourier\MultiCourierServiceProvider
 ```
 
-### Step 4:
+### Step 3:
 
-Set env configuration for individual couriers
-PATHAO_CLIENT_ID=XXX
+Set **.env** configuration for individual couriers
+
+```PATHAO_CLIENT_ID=XXX 
 PATHAO_CLIENT_SECRET="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 PATHAO_USERNAME="xxxx@example.com"
 PATHAO_PASSWORD="xxxxxx"
@@ -30,14 +31,7 @@ ECOURIER_API_KEY='xxx'
 ECOURIER_API_SECRET='xxx'
 ECOURIER_USER_ID='xxxx'
 ECOURIER_ENVIRONMENT='xxxx'
-
 ```
-php artisan vendor:publish --provider=Xenon\MultiCourier\MultiCourierServiceProvider
-```
-
-
-
-
 
 Otherwise, if you want more control, you can use the underlying sender object. This will not touch any laravel facade or
 service provider.
@@ -71,12 +65,10 @@ $response = $courier->send();
 </pre>
 
 
-
-
 #### Currently Supported Courier Gateways
 
-* ECourier
-* Pathao
+* **ECourier**
+* **Pathao**
 
 
 We are continuously working in this open source library for adding more Bangladeshi courier companies. If you feel something
