@@ -11,7 +11,11 @@
 
 namespace Xenon\MultiCourier\Provider;
 
+use Exception;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Storage;
 use Xenon\MultiCourier\Courier;
 use Xenon\MultiCourier\Handler\ParameterException;
 use Xenon\MultiCourier\Handler\RenderException;
@@ -23,7 +27,7 @@ class Pathao extends AbstractProvider
     /**
      * @var string
      */
-    private $base_url = 'http://hermes-api.p-stageenv.xyz/aladdin/api/v1';
+    private $base_url = 'http://hermes-api.p-stageenv.xyz/aladdin/api/v1/';
     /**
      * @var mixed|string
      */
@@ -39,7 +43,7 @@ class Pathao extends AbstractProvider
         $this->senderObject = $sender;
 
         if ($this->senderObject->environment == 'production') {
-            $this->setBaseUrl('https://api-hermes.pathaointernal.com/aladdin/api/v1');
+            $this->setBaseUrl('https://api-hermes.pathaointernal.com/aladdin/api/v1/');
         }
     }
 
@@ -48,6 +52,7 @@ class Pathao extends AbstractProvider
      * @throws GuzzleException
      * @throws RequestException
      * @throws RenderException
+     * @throws Exception
      */
     public function sendRequest()
     {
@@ -58,12 +63,57 @@ class Pathao extends AbstractProvider
             throw new RenderException("No courier.php file exist inside config directory. You should publish vendor Xenon\MultiCourier\MultiCourierServiceProvider");
         }
 
-        $providerConfiguration = config('courier')['providers'][get_class($this)];
-        $this->authorize();
+        $existance = Storage::disk('local')->exists('pathao_bearer_token.json');
+        $headers = [];
 
-        $endpointData = $providerConfiguration['endpoints'][$endpoint];
-        $request = new Request($this->getBaseUrl(), $endpoint, $endpointData['method'], $config, $this->senderObject->getParams());
-        return $request->executeRequest();
+        if ($existance) {
+            $bearerToken = Storage::get('pathao_bearer_token.json');
+            $bearerToken = json_decode($bearerToken);
+            $bearerToken = $bearerToken[0];
+            $headers = [
+                'Authorization' => $bearerToken
+            ];
+
+            try {
+                $client = new Client();
+                $client->get(
+                    $this->base_url . 'cities/1/zone-list',
+                    array(
+                        'verify' => false,
+                        'headers' => $headers
+                    ),
+                );
+            } catch (ClientException $e) {
+
+                if ($e->getCode() == 401) {
+
+                    $this->generateToken();
+                    $bearerToken = Storage::get('pathao_bearer_token.json');
+                    $bearerToken = json_decode($bearerToken);
+                    $bearerToken = $bearerToken[0];
+                    $headers = [
+                        'Authorization' => $bearerToken
+                    ];
+                } else {
+                    throw new RequestException($e->getMessage());
+                }
+            }
+        } else {
+            $this->generateToken();
+            $bearerToken = Storage::get('pathao_bearer_token.json');
+            $bearerToken = json_decode($bearerToken);
+            $bearerToken = $bearerToken[0];
+            $headers = [
+                'Authorization' => $bearerToken
+            ];
+        }
+
+
+        $requestMethod = $this->senderObject->getMethod();
+        $request = new Request($this->getBaseUrl(), $endpoint, $requestMethod, $headers, $this->senderObject->getParams());
+        $response = $request->executeRequest();
+
+        return $response->getData();
     }
 
     /**
@@ -148,17 +198,16 @@ class Pathao extends AbstractProvider
      */
     public function authorize()
     {
-        //$providerConfiguration = config('courier')['providers'][get_class($this)];
+        $providerConfiguration = config('courier')['providers'][get_class($this)];
         $params = [
-            'client_id' => env('PATHAO_CLIENT_ID'),
-            'client_secret' => env('PATHAO_CLIENT_SECRET'),
-            'username' => env('PATHAO_USERNAME'),
-            'password' => env('PATHAO_PASSWORD'),
-            'grant_type' => env('PATHAO_GRANT_TYPE'),
+            'client_id' => $providerConfiguration['PATHAO_CLIENT_ID'],
+            'client_secret' => $providerConfiguration['PATHAO_CLIENT_SECRET'],
+            'username' => $providerConfiguration['PATHAO_USERNAME'],
+            'password' => $providerConfiguration['PATHAO_PASSWORD'],
+            'grant_type' => $providerConfiguration['PATHAO_GRANT_TYPE'],
         ];
 
-
-        $request = new Request($this->getBaseUrl(), '/issue-token', 'post', [], $params);
+        $request = new Request($this->getBaseUrl(), 'issue-token', 'post', [], $params);
         try {
             $response = $request->executeRequest();
 
@@ -174,5 +223,22 @@ class Pathao extends AbstractProvider
             throw new RequestException($e->getMessage());
         }
 
+    }
+
+    /**
+     * @return void
+     * @throws RequestException
+     * @throws Exception
+     */
+    private function generateToken(): void
+    {
+        $accessToken = $this->authorize();
+        $accessTokenArray = ['Bearer' . ' ' . $accessToken];
+        $accessTokenJson = json_encode($accessTokenArray);
+        try {
+            Storage::disk('local')->put('pathao_bearer_token.json', $accessTokenJson);
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
     }
 }

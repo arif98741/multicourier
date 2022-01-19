@@ -27,17 +27,26 @@ service provider.
 use Xenon\MultiCourier\Provider\ECourier;
 use Xenon\MultiCourier\Courier;
 
-
 $courier = Courier::getInstance();
-$courier->setProvider(ECourier::class,'production');
-$courier->setConfig([
-	'API-KEY' => 'XXX',
-	'API-SECRET' => 'XXX',
-	'USER-ID' => 'XXXX',
-]);
-$courier->setRequestEndpoint('packages', ['city' => 'Tangail']);
+$courier->setProvider(ECourier::class, 'local'); /* local/production */
+$courier->setMethod('get');
+$courier->setRequestEndpoint('city-list', []); //second param should be array. its optional. you should form params here
 $response = $courier->send();
 echo $response->getData();
+</pre>
+
+
+#### Sample Code Requesting to Pathao
+
+<pre>
+use Xenon\MultiCourier\Courier;
+use Xenon\MultiCourier\Provider\Pathao;
+
+$courier = Courier::getInstance();
+$courier->setProvider(Pathao::class, 'local'); /* local/production */
+$courier->setMethod('get');
+$courier->setRequestEndpoint('cities/1/zone-list', []); //second param should be array. its optional. you should form params here
+$response = $courier->send();
 </pre>
 
 
@@ -46,6 +55,7 @@ echo $response->getData();
 #### Currently Supported Courier Gateways
 
 * ECourier
+* Pathao
 
 
 We are continuously working in this open source library for adding more Bangladeshi courier companies. If you feel something

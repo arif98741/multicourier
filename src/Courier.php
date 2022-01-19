@@ -100,6 +100,7 @@ class Courier
      */
     public function getConfig()
     {
+        //$providerConfiguration = config('courier')['providers'][get_class($this)];
         return $this->config;
     }
 
@@ -161,10 +162,6 @@ class Courier
             throw  new RequestException("Api endpoint missing for $providerClass");
         }
 
-        if (!is_array($this->getConfig())) {
-            throw  new ParameterException('config must be an array');
-        }
-
 
         // $this->provider->errorException();
 
@@ -184,6 +181,7 @@ class Courier
     }
 
     /**
+     * This method accept request endpoint
      * @param mixed $requestEndpoint
      */
     public function setRequestEndpoint($requestEndpoint, array $params = []): void

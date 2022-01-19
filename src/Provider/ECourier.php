@@ -52,12 +52,13 @@ class ECourier extends AbstractProvider
     public function sendRequest()
     {
         $endpoint = $this->senderObject->getRequestEndpoint();
-        $headerConfig = $this->senderObject->getConfig();
+        $providerConfiguration = config('courier')['providers'][get_class($this)];
+        $headerConfig = [
+            'API-KEY' => $providerConfiguration['API-KEY'],
+            'API-SECRET' => $providerConfiguration['API-SECRET'],
+            'USER-ID' => $providerConfiguration['USER-ID'],
+        ];
 
-        $courierConfig = config('courier');
-        if ($courierConfig == null) {
-            throw new RenderException("No courier.php file exist inside config directory. You should publish vendor Xenon\MultiCourier\MultiCourierServiceProvider");
-        }
 
         $request = new Request($this->getBaseUrl(), $endpoint, 'post', $headerConfig, $this->senderObject->getParams());
         return $request->executeRequest();

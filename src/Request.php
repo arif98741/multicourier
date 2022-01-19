@@ -63,7 +63,7 @@ class Request
      * @throws GuzzleException
      * @throws RequestException
      */
-    private function get($requestUrl, array $query = [], bool $verify = false, $timeout = 10.0)
+    private function get($requestUrl, $query = [], bool $verify = false, $timeout = 10.0)
     {
         $client = new Client([
             'base_uri' => $this->base_url,
@@ -112,7 +112,7 @@ class Request
      * @throws GuzzleException
      * @throws RequestException
      */
-    public function executeRequest()
+    public function executeRequest(): Request
     {
         $requestUrl = $this->base_url . $this->endpoint;
 
