@@ -31,7 +31,7 @@ class Courier
     /**
      * @var
      */
-    private $requestEndpoint;
+    public $requestEndpoint;
 
     /**
      * @var
@@ -42,6 +42,11 @@ class Courier
      * @var
      */
     private $params;
+
+    /**
+     * @var
+     */
+    private $headers;
 
     public $environment;
 
@@ -126,6 +131,22 @@ class Courier
         $this->params = $params;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+
+    /**
+     * @return void
+     */
+    public function setHeaders($headers)
+    {
+        $this->headers = $headers;
+    }
+
 
     /**
      * Send Message Finally
@@ -145,7 +166,7 @@ class Courier
         }
 
 
-        $this->provider->errorException();
+        // $this->provider->errorException();
 
         // $config = Config::get('sms');
         //dd($config);
@@ -223,9 +244,9 @@ class Courier
             }
 
             $this->environment = $environment;
-        } catch (XenonException $exception) {
+        } catch (RenderException $exception) {
 
-            $exception->showException($ProviderClass);
+            throw new RenderException($exception->getMessage());
         }
 
         $this->provider = new $ProviderClass($this);

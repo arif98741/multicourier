@@ -46,26 +46,20 @@ class ECourier extends AbstractProvider
     /**
      * Send Request To Api and Send Message
      * @throws GuzzleException
-     * @throws ParameterException|RequestException
+     * @throws RequestException
      * @throws RenderException
      */
     public function sendRequest()
     {
         $endpoint = $this->senderObject->getRequestEndpoint();
-        $config = $this->senderObject->getConfig();
+        $headerConfig = $this->senderObject->getConfig();
+
         $courierConfig = config('courier');
         if ($courierConfig == null) {
             throw new RenderException("No courier.php file exist inside config directory. You should publish vendor Xenon\MultiCourier\MultiCourierServiceProvider");
         }
 
-        $providerConfiguration = config('courier')['providers'][get_class($this)];
-
-        if (!array_key_exists($endpoint, $providerConfiguration['endpoints'])) {
-            throw new ParameterException("Endpoint $endpoint doesn't exist for " . self::class);
-        }
-
-        $endpointData = $providerConfiguration['endpoints'][$endpoint];
-        $request = new Request($this->getBaseUrl(), $endpoint, $endpointData['method'], $config, $this->senderObject->getParams());
+        $request = new Request($this->getBaseUrl(), $endpoint, 'post', $headerConfig, $this->senderObject->getParams());
         return $request->executeRequest();
     }
 
@@ -118,5 +112,26 @@ class ECourier extends AbstractProvider
             throw new ParameterException('USER-ID key is absent in configuration');
         }
 
+    }
+
+    /**
+     * @return mixed
+     */
+    function placeOrder()
+    {
+        // TODO: Implement placeOrder() method.
+    }
+
+    /**
+     * @return mixed
+     */
+    function getOrders()
+    {
+        // TODO: Implement getOrders() method.
+    }
+
+    public function authorize()
+    {
+        // TODO: Implement authorize() method.
     }
 }

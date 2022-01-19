@@ -88,7 +88,7 @@ class Request
      * @throws GuzzleException
      * @throws RequestException
      */
-    private function post($requestUrl, array $query = null, bool $verify = false, $timeout = 10.0)
+    private function post($requestUrl, array $formParams = null, bool $verify = false)
     {
         $client = new Client([
             'base_uri' => $requestUrl,
@@ -97,9 +97,10 @@ class Request
 
         try {
             return $client->request('POST', '', [
-                'query' => $query,
+                'form_params' => $formParams,
                 'verify' => $verify,
-                'headers' => $this->headers
+                'headers' => $this->headers,
+                'content-type' => 'application/json'
             ]);
         } catch (ConnectException|ClientException $e) {
             throw new RequestException($e->getMessage());
@@ -114,7 +115,7 @@ class Request
     public function executeRequest()
     {
         $requestUrl = $this->base_url . $this->endpoint;
-       
+
         if ($this->method == 'post') {
             $requestObject = $this->post($requestUrl, $this->params);
         } else {

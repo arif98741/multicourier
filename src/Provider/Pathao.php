@@ -46,7 +46,7 @@ class Pathao extends AbstractProvider
     /**
      * Send Request To Api and Send Message
      * @throws GuzzleException
-     * @throws ParameterException|RequestException
+     * @throws RequestException
      * @throws RenderException
      */
     public function sendRequest()
@@ -59,10 +59,7 @@ class Pathao extends AbstractProvider
         }
 
         $providerConfiguration = config('courier')['providers'][get_class($this)];
-
-        if (!array_key_exists($endpoint, $providerConfiguration['endpoints'])) {
-            throw new ParameterException("Endpoint $endpoint doesn't exist for " . self::class);
-        }
+        $this->authorize();
 
         $endpointData = $providerConfiguration['endpoints'][$endpoint];
         $request = new Request($this->getBaseUrl(), $endpoint, $endpointData['method'], $config, $this->senderObject->getParams());
@@ -126,7 +123,56 @@ class Pathao extends AbstractProvider
         if (!array_key_exists('grant_type', $this->senderObject->getConfig())) {
             throw new ParameterException('grant_type key is absent in configuration');
         }
+    }
 
+    /**
+     * @return void
+     */
+    function placeOrder()
+    {
+
+        // TODO: Implement placeOrder() method.
+    }
+
+    /**
+     * @return void
+     */
+    function getOrders()
+    {
+        // TODO: Implement getOrders() method.
+    }
+
+    /**
+     * @return Request
+     * @throws RequestException
+     */
+    public function authorize()
+    {
+        //$providerConfiguration = config('courier')['providers'][get_class($this)];
+        $params = [
+            'client_id' => env('PATHAO_CLIENT_ID'),
+            'client_secret' => env('PATHAO_CLIENT_SECRET'),
+            'username' => env('PATHAO_USERNAME'),
+            'password' => env('PATHAO_PASSWORD'),
+            'grant_type' => env('PATHAO_GRANT_TYPE'),
+        ];
+
+
+        $request = new Request($this->getBaseUrl(), '/issue-token', 'post', [], $params);
+        try {
+            $response = $request->executeRequest();
+
+            if ($response->statusCode == 200) {
+                $jsonResponse = $response->response;
+                $jsonDecode = json_decode($jsonResponse);
+                return $jsonDecode->access_token;
+            } else {
+                throw new RequestException("Failed to authenticate pathao endpoint; Status Code " . $response->statusCode . ' ' . __CLASS__);
+
+            }
+        } catch (GuzzleException|RequestException $e) {
+            throw new RequestException($e->getMessage());
+        }
 
     }
 }
