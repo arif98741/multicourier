@@ -70,7 +70,11 @@ $response = $courier->send();
 * **ECourier**
 * **Pathao**
 
+<p align="center" ><img  src="https://raw.githubusercontent.com/arif98741/multicourier/master/img/pathao.png">
+<img src="https://raw.githubusercontent.com/arif98741/multicourier/master/img/ecourier.png"></p>
+
 
 We are continuously working in this open source library for adding more Bangladeshi courier companies. If you feel something
-is missing then make a issue regarding that. If you want to contribute in this library, then you are highly welcome to
+is missing then make a issue regarding that. Your can pull request to **dev** branch. 
+If you want to contribute in this library, then you are highly welcome to
 do that....
