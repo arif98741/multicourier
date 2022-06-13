@@ -10,37 +10,17 @@ use Xenon\MultiCourier\Handler\RequestException;
 
 class Request
 {
-    /**
-     * @var string
-     */
-    private $base_url;
-    /**
-     * @var string
-     */
-    private $endpoint;
-
-    /**
-     * @var
-     */
     public $response;
 
-    /**
-     * @var
-     */
-    private $method;
-
-    /**
-     * @var
-     */
     public $statusCode;
-    /**
-     * @var
-     */
+
+    private $base_url;
+
+    private string $endpoint;
+
     private $params;
-    /**
-     * @var array
-     */
-    private $headers;
+
+    private array $headers;
 
     /**
      * @param $base_url
@@ -131,7 +111,7 @@ class Request
     /**
      * @return mixed
      */
-    public function getData()
+    public function getData(): mixed
     {
         return $this->response;
     }
@@ -139,10 +119,9 @@ class Request
     /**
      * @return mixed
      */
-    public function getStatusCode()
+    public function getStatusCode(): mixed
     {
-        return $this->getStatusCode();
+        return $this->statusCode;
     }
-
 
 }

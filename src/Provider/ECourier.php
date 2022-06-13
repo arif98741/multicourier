@@ -14,7 +14,6 @@ namespace Xenon\MultiCourier\Provider;
 use GuzzleHttp\Exception\GuzzleException;
 use Xenon\MultiCourier\Courier;
 use Xenon\MultiCourier\Handler\ParameterException;
-use Xenon\MultiCourier\Handler\ErrorException;
 use Xenon\MultiCourier\Handler\RequestException;
 use Xenon\MultiCourier\Request;
 
@@ -23,30 +22,34 @@ class ECourier extends AbstractProvider
     /**
      * @var string
      */
-    private $base_url = 'https://staging.ecourier.com.bd/api/';
+    private string $base_url = 'https://staging.ecourier.com.bd/api/';
     /**
      * @var mixed|string
      */
-    private $environment;
+    private string $environment;
 
     /**
      * ECourier constructor.
      * @param Courier $courier
      * @param string $environment
+     * @throws ParameterException
      */
     public function __construct(Courier $courier, string $environment = 'local')
     {
         $this->senderObject = $courier;
+        $this->errorException();
 
         if ($this->senderObject->environment == 'production') {
             $this->setBaseUrl('https://backoffice.ecourier.com.bd/api/');
         }
+
     }
 
     /**
-     * Send Request To Api and Send Message
      * @throws GuzzleException
      * @throws RequestException
+     * @deprecated
+     * Send Request To Api and Send Message
      */
     public function sendRequest()
     {
@@ -61,7 +64,6 @@ class ECourier extends AbstractProvider
         $request = new Request($this->getBaseUrl(), $endpoint, 'post', $headerConfig, $this->senderObject->getParams());
         return $request->executeRequest();
     }
-
 
 
     /**
@@ -116,11 +118,81 @@ class ECourier extends AbstractProvider
     }
 
     /**
+     * @throws GuzzleException
+     * @throws RequestException
+     */
+    public function getCities(): Request
+    {
+        $request = new Request($this->getBaseUrl(), 'city-list', 'post', $this->getHeaderConfig(), $this->senderObject->getParams());
+        return $request->executeRequest();
+    }
+
+
+    /**
+     * @throws GuzzleException
+     * @throws RequestException
+     * @throws ParameterException
+     */
+    public function getThanas(): Request
+    {
+        $params = $this->senderObject->getParams();
+        if (!is_array($params)) {
+            throw new ParameterException('Parameter city missing for getting thana. Use setParams() for setting parameters ');
+        }
+        if (count($params) == 0 || !array_key_exists('city', $params)) {
+            throw new ParameterException('Parameter city missing for getting thana.');
+        }
+
+        $request = new Request($this->getBaseUrl(), 'thana-list', 'post', $this->getHeaderConfig(), $this->senderObject->getParams());
+        return $request->executeRequest();
+    }
+
+    /**
+     * @throws GuzzleException
+     * @throws RequestException
+     * @throws ParameterException
+     */
+    public function trackOrder(): Request
+    {
+        $params = $this->senderObject->getParams();
+        if (!is_array($params)) {
+            throw new ParameterException('Parameter ecr missing for tracking order. Use setParams() for setting parameters ');
+        }
+        if (count($params) == 0 || !array_key_exists('ecr', $params)) {
+            throw new ParameterException('Parameter ecr missing for tracking order.');
+        }
+
+        $request = new Request($this->getBaseUrl(), 'track', 'post', $this->getHeaderConfig(), $this->senderObject->getParams());
+        return $request->executeRequest();
+    }
+
+    /**
+     * @throws GuzzleException
+     * @throws RequestException
+     */
+    public function getPackages(): Request
+    {
+        $request = new Request($this->getBaseUrl(), 'packages', 'post', $this->getHeaderConfig(), $this->senderObject->getParams());
+        return $request->executeRequest();
+    }
+
+
+    /**
      * @return mixed
+     * @throws ParameterException
      */
     function placeOrder()
     {
+        $params = $this->senderObject->getParams();
+        if (!is_array($params)) {
+            throw new ParameterException('Parameter data array missing for tracking order. Use setParams() for setting parameters ');
+        }
+        if (count($params) == 0) {
+            throw new ParameterException('Parameter ecr missing for tracking order.');
+        }
 
+        $request = new Request($this->getBaseUrl(), 'order-place', 'post', $this->getHeaderConfig(), $this->senderObject->getParams());
+        return $request->executeRequest();
     }
 
     /**
@@ -134,5 +206,21 @@ class ECourier extends AbstractProvider
     public function authorize()
     {
         // TODO: Implement authorize() method.
+    }
+
+
+    /**
+     * @return array
+     */
+    private function getHeaderConfig(): array
+    {
+        $providerConfiguration = $this->senderObject->getConfig();
+
+        $headerConfig = [
+            'API-KEY' => $providerConfiguration['API-KEY'],
+            'API-SECRET' => $providerConfiguration['API-SECRET'],
+            'USER-ID' => $providerConfiguration['USER-ID'],
+        ];
+        return $headerConfig;
     }
 }

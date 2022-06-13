@@ -15,6 +15,7 @@ namespace Xenon\MultiCourier;
 use Exception;
 use Xenon\MultiCourier\Facades\Logger;
 use Xenon\MultiCourier\Handler\ErrorException;
+use Xenon\MultiCourier\Handler\RequestException;
 use Xenon\MultiCourier\Provider\AbstractProvider;
 
 class Courier
@@ -52,10 +53,6 @@ class Courier
      * @var
      */
     private $method;
-    /**
-     * @var mixed
-     */
-    private $message;
 
     /**
      * @return mixed
@@ -101,7 +98,8 @@ class Courier
      * @return mixed
      */
     public function getConfig()
-    {return $this->config;
+    {
+        return $this->config;
     }
 
     /**
@@ -110,7 +108,7 @@ class Courier
      * @throws Exception
      * @since v1.0.0
      */
-    public function setConfig($config): Courier
+    public function setConfig(array $config): Courier
     {
         $this->config = $config;
         return $this;
@@ -155,7 +153,6 @@ class Courier
      */
     public function send()
     {
-        return new $this->provider->sendRequest('');
 
     }
 
@@ -169,8 +166,8 @@ class Courier
 
     /**
      * This method accept request endpoint
-     * @deprecated
      * @param mixed $requestEndpoint
+     * @deprecated
      */
     public function setRequestEndpoint($requestEndpoint, array $params = []): void
     {
@@ -211,7 +208,7 @@ class Courier
     /**
      * Return this class object
      * @param $ProviderClass
-     * @param string|null $environment
+     * @param string $environment
      * @return Courier
      * @throws ErrorException
      * @since v1.0.0
@@ -235,8 +232,83 @@ class Courier
             throw new ErrorException($exception->getMessage());
         }
 
+
         $this->provider = $ProviderClass;
+
         return $this;
+    }
+
+    /**
+     * @return void
+     * @throws RequestException
+     * @since v1.0.1
+     */
+    public function getCities()
+    {
+        $providerObject = new $this->provider($this);
+        if (!method_exists($providerObject, __FUNCTION__)) {
+            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
+        }
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @return mixed
+     * @throws RequestException
+     * @since v1.0.1
+     */
+    public function getThanas()
+    {
+        $providerObject = new $this->provider($this);
+        if (!method_exists($providerObject, __FUNCTION__)) {
+            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
+        }
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @throws RequestException
+     * @since v1.0.1
+     */
+    public function trackOrder()
+    {
+        $providerObject = new $this->provider($this);
+
+        if (!method_exists($providerObject, __FUNCTION__)) {
+            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
+        }
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @throws RequestException
+     * @since v1.0.1
+     */
+    public function getPackages()
+    {
+        $providerObject = new $this->provider($this);
+
+        if (!method_exists($providerObject, __FUNCTION__)) {
+            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
+        }
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @throws RequestException
+     * @since v1.0.1
+     */
+    public function placeOrder()
+    {
+        $providerObject = new $this->provider($this);
+
+        if (!method_exists($providerObject, __FUNCTION__)) {
+            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
+        }
+
+        return $providerObject->{__FUNCTION__}();
     }
 
     /**
@@ -260,7 +332,6 @@ class Courier
                 'provider' => get_class($this->provider),
                 'request_json' => json_encode([
                     'config' => $config['providers'][get_class($this->provider)],
-                    'mobile' => $this->getMobile(),
                     'message' => $this->getMessage()
                 ])
                 ,
