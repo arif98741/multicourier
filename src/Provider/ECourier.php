@@ -14,7 +14,7 @@ namespace Xenon\MultiCourier\Provider;
 use GuzzleHttp\Exception\GuzzleException;
 use Xenon\MultiCourier\Courier;
 use Xenon\MultiCourier\Handler\ParameterException;
-use Xenon\MultiCourier\Handler\RenderException;
+use Xenon\MultiCourier\Handler\ErrorException;
 use Xenon\MultiCourier\Handler\RequestException;
 use Xenon\MultiCourier\Request;
 
@@ -47,7 +47,7 @@ class ECourier extends AbstractProvider
      * Send Request To Api and Send Message
      * @throws GuzzleException
      * @throws RequestException
-     * @throws RenderException
+     * @throws ErrorException
      */
     public function sendRequest()
     {

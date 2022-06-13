@@ -18,7 +18,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Storage;
 use Xenon\MultiCourier\Courier;
 use Xenon\MultiCourier\Handler\ParameterException;
-use Xenon\MultiCourier\Handler\RenderException;
+use Xenon\MultiCourier\Handler\ErrorException;
 use Xenon\MultiCourier\Handler\RequestException;
 use Xenon\MultiCourier\Request;
 
@@ -51,7 +51,7 @@ class Pathao extends AbstractProvider
      * Send Request To Api and Send Message
      * @throws GuzzleException
      * @throws RequestException
-     * @throws RenderException
+     * @throws ErrorException
      * @throws Exception
      */
     public function sendRequest()
@@ -60,7 +60,7 @@ class Pathao extends AbstractProvider
         $config = $this->senderObject->getConfig();
         $courierConfig = config('courier');
         if ($courierConfig == null) {
-            throw new RenderException("No courier.php file exist inside config directory. You should publish vendor Xenon\MultiCourier\MultiCourierServiceProvider");
+            throw new ErrorException("No courier.php file exist inside config directory. You should publish vendor Xenon\MultiCourier\MultiCourierServiceProvider");
         }
 
         $existance = Storage::disk('local')->exists('pathao_bearer_token.json');

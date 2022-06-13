@@ -15,7 +15,7 @@ namespace Xenon\MultiCourier\Handler;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-class RenderException extends \Exception
+class ErrorException extends \Exception
 {
     /**
      * Report the exception.

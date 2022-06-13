@@ -14,8 +14,7 @@ namespace Xenon\MultiCourier;
 
 use Exception;
 use Xenon\MultiCourier\Facades\Logger;
-use Xenon\MultiCourier\Handler\ParameterException;
-use Xenon\MultiCourier\Handler\RenderException;
+use Xenon\MultiCourier\Handler\ErrorException;
 use Xenon\MultiCourier\Handler\RequestException;
 use Xenon\MultiCourier\Provider\AbstractProvider;
 
@@ -54,6 +53,10 @@ class Courier
      * @var
      */
     private $method;
+    /**
+     * @var mixed
+     */
+    private $message;
 
     /**
      * @return mixed
@@ -151,25 +154,12 @@ class Courier
 
     /**
      * Send Message Finally
-     * @throws ParameterException
      * @throws RequestException
      * @since v1.0.5
      */
     public function send()
     {
-        if (empty($this->getRequestEndpoint())) {
-            $providerClass = get_class($this->provider);
-            throw  new RequestException("Api endpoint missing for $providerClass");
-        }
-
-
-        // $this->provider->errorException();
-
-        // $config = Config::get('sms');
-        //dd($config);
-        // $this->logGenerate($config, $response);
-
-        return $this->provider->sendRequest($this->getRequestEndpoint());
+        return new $this->provider->sendRequest($this->getRequestEndpoint());
     }
 
     /**
@@ -226,7 +216,7 @@ class Courier
      * @param $ProviderClass
      * @param string|null $environment
      * @return Courier
-     * @throws RenderException
+     * @throws ErrorException
      * @since v1.0.0
      */
     public function setProvider($ProviderClass, string $environment = null): Courier
@@ -234,20 +224,21 @@ class Courier
 
         try {
             if (!class_exists($ProviderClass)) {
-                throw new RenderException("Courier Provider '$ProviderClass' not found");
+                throw new ErrorException("Courier Provider $ProviderClass not found");
             }
 
             if (!is_subclass_of($ProviderClass, AbstractProvider::class)) {
-                throw new RenderException("Provider '$ProviderClass' is not a " . AbstractProvider::class);
+                throw new ErrorException("Provider '$ProviderClass' is not a " . AbstractProvider::class);
             }
 
             $this->environment = $environment;
-        } catch (RenderException $exception) {
 
-            throw new RenderException($exception->getMessage());
+        } catch (ErrorException $exception) {
+
+            throw new ErrorException($exception->getMessage());
         }
 
-        $this->provider = new $ProviderClass($this);
+        $this->provider = $ProviderClass;
         return $this;
     }
 

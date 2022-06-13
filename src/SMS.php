@@ -18,7 +18,7 @@ class SMS
     }
 
     /**
-     * @throws Handler\RenderException
+     * @throws Handler\ErrorException
      * @throws Exception
      * @version v1.0.32
      * @since v1.0.31
