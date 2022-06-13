@@ -176,25 +176,6 @@ class Courier
             $this->setParams($params);
     }
 
-    /**
-     * @return mixed
-     * @since v1.0.0
-     */
-    public function getMessage()
-    {
-        return $this->message;
-    }
-
-    /**
-     * @param mixed $message
-     * @return Courier
-     * @since v1.0.0
-     */
-    public function setMessage($message = ''): Courier
-    {
-        $this->message = $message;
-        return self::getInstance();
-    }
 
     /**
      * @return mixed
@@ -302,6 +283,10 @@ class Courier
      */
     public function placeOrder()
     {
+        echo '<pre>';
+        print_r(get_class_methods($this));
+        echo '</pre>';
+        die;
         $providerObject = new $this->provider($this);
 
         if (!method_exists($providerObject, __FUNCTION__)) {
