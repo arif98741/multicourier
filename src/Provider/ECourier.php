@@ -47,7 +47,6 @@ class ECourier extends AbstractProvider
      * Send Request To Api and Send Message
      * @throws GuzzleException
      * @throws RequestException
-     * @throws ErrorException
      */
     public function sendRequest()
     {
@@ -59,10 +58,11 @@ class ECourier extends AbstractProvider
             'USER-ID' => $providerConfiguration['USER-ID'],
         ];
 
-
         $request = new Request($this->getBaseUrl(), $endpoint, 'post', $headerConfig, $this->senderObject->getParams());
         return $request->executeRequest();
     }
+
+
 
     /**
      * @return string
@@ -120,7 +120,7 @@ class ECourier extends AbstractProvider
      */
     function placeOrder()
     {
-        // TODO: Implement placeOrder() method.
+
     }
 
     /**

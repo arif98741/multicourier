@@ -15,7 +15,6 @@ namespace Xenon\MultiCourier;
 use Exception;
 use Xenon\MultiCourier\Facades\Logger;
 use Xenon\MultiCourier\Handler\ErrorException;
-use Xenon\MultiCourier\Handler\RequestException;
 use Xenon\MultiCourier\Provider\AbstractProvider;
 
 class Courier
@@ -47,7 +46,7 @@ class Courier
      */
     private $headers;
 
-    public $environment;
+    public $environment = 'local';
 
     /**
      * @var
@@ -102,9 +101,7 @@ class Courier
      * @return mixed
      */
     public function getConfig()
-    {
-        //$providerConfiguration = config('courier')['providers'][get_class($this)];
-        return $this->config;
+    {return $this->config;
     }
 
     /**
@@ -154,12 +151,12 @@ class Courier
 
     /**
      * Send Message Finally
-     * @throws RequestException
      * @since v1.0.5
      */
     public function send()
     {
-        return new $this->provider->sendRequest($this->getRequestEndpoint());
+        return new $this->provider->sendRequest('');
+
     }
 
     /**
@@ -172,6 +169,7 @@ class Courier
 
     /**
      * This method accept request endpoint
+     * @deprecated
      * @param mixed $requestEndpoint
      */
     public function setRequestEndpoint($requestEndpoint, array $params = []): void
@@ -197,7 +195,6 @@ class Courier
      */
     public function setMessage($message = ''): Courier
     {
-
         $this->message = $message;
         return self::getInstance();
     }
@@ -219,7 +216,7 @@ class Courier
      * @throws ErrorException
      * @since v1.0.0
      */
-    public function setProvider($ProviderClass, string $environment = null): Courier
+    public function setProvider($ProviderClass, string $environment = 'local'): Courier
     {
 
         try {
