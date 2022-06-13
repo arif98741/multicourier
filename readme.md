@@ -53,7 +53,6 @@ $courier->setConfig([
     'API-SECRET' => 'xxx',
     'USER-ID' => 'xxx',
 ]);
-$courier->setParams(['ecr' => 'ECR38786912120622']);
 $orderData = array(
     'recipient_name' => 'XXXXX',
     'recipient_mobile' => '017XXXXX',
@@ -80,7 +79,7 @@ $orderData = array(
 );
 
 $courier->setParams($orderData);
-$cities = $courier->placeOrder();
+$response = $courier->placeOrder();
 
 
 </pre>
