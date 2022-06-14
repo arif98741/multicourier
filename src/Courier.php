@@ -11,7 +11,6 @@
 
 namespace Xenon\MultiCourier;
 
-
 use Exception;
 use Xenon\MultiCourier\Facades\Logger;
 use Xenon\MultiCourier\Handler\ErrorException;
@@ -21,60 +20,37 @@ use Xenon\MultiCourier\Provider\AbstractProvider;
 class Courier
 {
     /**
+     * @var null
+     */
+    private static $instance = null;
+    /**
+     * @var
+     */
+    public $requestEndpoint;
+    /**
+     * @var
+     */
+    public $environment = 'local';
+    /**
      * @var AbstractProvider
      */
     private $provider;
     /**
      * @var
      */
-    /**
-     * @var
-     */
-    public $requestEndpoint;
-
-    /**
-     * @var
-     */
     private $config;
-
     /**
      * @var
      */
     private $params;
-
     /**
      * @var
      */
     private $headers;
-
-    public $environment = 'local';
-
     /**
      * @var
      */
     private $method;
-
-    /**
-     * @return mixed
-     */
-    public function getMethod()
-    {
-        return $this->method;
-    }
-
-    /**
-     * @param mixed $method
-     */
-    public function setMethod($method): void
-    {
-        $this->method = $method;
-    }
-
-    /**
-     * @var null
-     */
-    private static $instance = null;
-
 
     /**
      * This is the static method that controls the access to the singleton
@@ -92,6 +68,22 @@ class Courier
         }
 
         return self::$instance;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    /**
+     * @param mixed $method
+     */
+    public function setMethod($method): void
+    {
+        $this->method = $method;
     }
 
     /**
@@ -146,16 +138,6 @@ class Courier
         $this->headers = $headers;
     }
 
-
-    /**
-     * Send Message Finally
-     * @since v1.0.5
-     */
-    public function send()
-    {
-
-    }
-
     /**
      * @return mixed
      */
@@ -188,22 +170,22 @@ class Courier
 
     /**
      * Return this class object
-     * @param $ProviderClass
+     * @param $providerClass
      * @param string $environment
      * @return Courier
      * @throws ErrorException
      * @since v1.0.0
      */
-    public function setProvider($ProviderClass, string $environment = 'local'): Courier
+    public function setProvider($providerClass, string $environment = 'local'): Courier
     {
 
         try {
-            if (!class_exists($ProviderClass)) {
-                throw new ErrorException("Courier Provider $ProviderClass not found");
+            if (!class_exists($providerClass)) {
+                throw new ErrorException("Courier provider doesn't exist-  $providerClass");
             }
 
-            if (!is_subclass_of($ProviderClass, AbstractProvider::class)) {
-                throw new ErrorException("Provider '$ProviderClass' is not a " . AbstractProvider::class);
+            if (!is_subclass_of($providerClass, AbstractProvider::class)) {
+                throw new ErrorException("Provider $providerClass is not a " . AbstractProvider::class);
             }
 
             $this->environment = $environment;
@@ -213,9 +195,7 @@ class Courier
             throw new ErrorException($exception->getMessage());
         }
 
-
-        $this->provider = $ProviderClass;
-
+        $this->provider = $providerClass;
         return $this;
     }
 
@@ -227,9 +207,7 @@ class Courier
     public function getCities()
     {
         $providerObject = new $this->provider($this);
-        if (!method_exists($providerObject, __FUNCTION__)) {
-            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
-        }
+        $this->methodNotException($providerObject, __FUNCTION__);
         return $providerObject->{__FUNCTION__}();
     }
 
@@ -241,9 +219,7 @@ class Courier
     public function getThanas()
     {
         $providerObject = new $this->provider($this);
-        if (!method_exists($providerObject, __FUNCTION__)) {
-            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
-        }
+        $this->methodNotException($providerObject, __FUNCTION__);
         return $providerObject->{__FUNCTION__}();
     }
 
@@ -255,9 +231,20 @@ class Courier
     {
         $providerObject = new $this->provider($this);
 
-        if (!method_exists($providerObject, __FUNCTION__)) {
-            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
-        }
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @throws RequestException
+     * @since v1.0.1
+     */
+    public function trackChildOrder()
+    {
+        $providerObject = new $this->provider($this);
+
+        $this->methodNotException($providerObject, __FUNCTION__);
 
         return $providerObject->{__FUNCTION__}();
     }
@@ -270,9 +257,7 @@ class Courier
     {
         $providerObject = new $this->provider($this);
 
-        if (!method_exists($providerObject, __FUNCTION__)) {
-            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
-        }
+        $this->methodNotException($providerObject, __FUNCTION__);
 
         return $providerObject->{__FUNCTION__}();
     }
@@ -283,12 +268,8 @@ class Courier
      */
     public function placeOrder()
     {
-
         $providerObject = new $this->provider($this);
-
-        if (!method_exists($providerObject, __FUNCTION__)) {
-            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
-        }
+        $this->methodNotException($providerObject, __FUNCTION__);
 
         return $providerObject->{__FUNCTION__}();
     }
@@ -301,9 +282,20 @@ class Courier
     {
         $providerObject = new $this->provider($this);
 
-        if (!method_exists($providerObject, __FUNCTION__)) {
-            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
-        }
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @throws RequestException
+     * @since v1.0.1
+     */
+    public function cancelChildOrder()
+    {
+        $providerObject = new $this->provider($this);
+
+        $this->methodNotException($providerObject, __FUNCTION__);
 
         return $providerObject->{__FUNCTION__}();
     }
@@ -316,9 +308,7 @@ class Courier
     {
         $providerObject = new $this->provider($this);
 
-        if (!method_exists($providerObject, __FUNCTION__)) {
-            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
-        }
+        $this->methodNotException($providerObject, __FUNCTION__);
 
         return $providerObject->{__FUNCTION__}();
     }
@@ -331,9 +321,7 @@ class Courier
     {
         $providerObject = new $this->provider($this);
 
-        if (!method_exists($providerObject, __FUNCTION__)) {
-            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
-        }
+        $this->methodNotException($providerObject, __FUNCTION__);
 
         return $providerObject->{__FUNCTION__}();
     }
@@ -346,20 +334,81 @@ class Courier
     {
         $providerObject = new $this->provider($this);
 
-        if (!method_exists($providerObject, __FUNCTION__)) {
-            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
-        }
+        $this->methodNotException($providerObject, __FUNCTION__);
 
         return $providerObject->{__FUNCTION__}();
     }
 
+    /**
+     * @throws RequestException
+     */
     public function getBranches()
     {
         $providerObject = new $this->provider($this);
 
-        if (!method_exists($providerObject, __FUNCTION__)) {
-            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
-        }
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @throws RequestException
+     */
+    public function printLabel()
+    {
+        $providerObject = new $this->provider($this);
+
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+
+    /**
+     * @throws RequestException
+     */
+    public function boostSms()
+    {
+        $providerObject = new $this->provider($this);
+
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @throws RequestException
+     */
+    public function topupSms()
+    {
+        $providerObject = new $this->provider($this);
+
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @return mixed
+     * @throws RequestException
+     */
+    public function topTransactionStatus()
+    {
+        $providerObject = new $this->provider($this);
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @return mixed
+     * @throws RequestException
+     */
+    public function topupOtp()
+    {
+        $providerObject = new $this->provider($this);
+
+        $this->methodNotException($providerObject, __FUNCTION__);
 
         return $providerObject->{__FUNCTION__}();
     }
@@ -367,6 +416,7 @@ class Courier
     /**
      * @param $config
      * @param $response
+     * @deprecated
      */
     private function logGenerate($config, $response): void
     {
@@ -384,8 +434,7 @@ class Courier
             Logger::createLog([
                 'provider' => get_class($this->provider),
                 'request_json' => json_encode([
-                    'config' => $config['providers'][get_class($this->provider)],
-                    'message' => $this->getMessage()
+                    'config' => $config['providers'][$this->provider],
                 ])
                 ,
                 'response_json' => json_encode($providerResponse)
@@ -393,4 +442,16 @@ class Courier
         }
     }
 
+    /**
+     * @param $providerObject
+     * @param $method
+     * @return void
+     * @throws RequestException
+     */
+    private function methodNotException($providerObject, $method): void
+    {
+        if (!method_exists($providerObject, $method)) {
+            throw new RequestException("Method " . $method . " does not applicable for $this->provider class");
+        }
+    }
 }

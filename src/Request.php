@@ -39,28 +39,23 @@ class Request
     }
 
     /**
-     * @param false $verify
      * @throws GuzzleException
      * @throws RequestException
      */
-    private function get($requestUrl, $query = [], bool $verify = false, $timeout = 10.0)
+    public function executeRequest(): Request
     {
-        $client = new Client([
-            'base_uri' => $this->base_url,
-            'timeout' => $timeout,
-        ]);
+        $requestUrl = $this->base_url . $this->endpoint;
 
-        try {
-            return $client->request('GET', $requestUrl, [
-                'query' => $query,
-                'verify' => $verify,
-                'headers' => $this->headers,
-            ]);
-        } catch (ConnectException $e) {
-            throw new RequestException($e->getMessage());
+        if ($this->method == 'post') {
+            $requestObject = $this->post($requestUrl, $this->params);
+        } else {
+            $requestObject = $this->get($requestUrl, $this->params);
         }
 
-
+        $response = $requestObject->getBody();
+        $this->statusCode = $requestObject->getStatusCode();
+        $this->response = $response->getContents();
+        return $this;
     }
 
     /**
@@ -89,23 +84,36 @@ class Request
     }
 
     /**
+     * @param false $verify
      * @throws GuzzleException
      * @throws RequestException
      */
-    public function executeRequest(): Request
+    private function get($requestUrl, $query = [], bool $verify = false, $timeout = 10.0)
     {
-        $requestUrl = $this->base_url . $this->endpoint;
+        $client = new Client([
+            'base_uri' => $this->base_url,
+            'timeout' => $timeout,
+        ]);
 
-        if ($this->method == 'post') {
-            $requestObject = $this->post($requestUrl, $this->params);
-        } else {
-            $requestObject = $this->get($requestUrl, $this->params);
+        try {
+            return $client->request('GET', $requestUrl, [
+                'query' => $query,
+                'verify' => $verify,
+                'headers' => $this->headers,
+            ]);
+        } catch (ConnectException $e) {
+            throw new RequestException($e->getMessage());
         }
 
-        $response = $requestObject->getBody();
-        $this->statusCode = $requestObject->getStatusCode();
-        $this->response = $response->getContents();
-        return $this;
+
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStatusCode(): int
+    {
+        return $this->statusCode;
     }
 
     /**
@@ -116,14 +124,6 @@ class Request
         if ($array)
             return (array)$this->response;
         return $this->response;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getStatusCode(): int
-    {
-        return $this->statusCode;
     }
 
 }

@@ -17,8 +17,8 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Storage;
 use Xenon\MultiCourier\Courier;
-use Xenon\MultiCourier\Handler\ParameterException;
 use Xenon\MultiCourier\Handler\ErrorException;
+use Xenon\MultiCourier\Handler\ParameterException;
 use Xenon\MultiCourier\Handler\RequestException;
 use Xenon\MultiCourier\Request;
 
@@ -60,7 +60,7 @@ class Pathao extends AbstractProvider
         $config = $this->senderObject->getConfig();
         $courierConfig = config('courier');
         if ($courierConfig == null) {
-            throw new ErrorException("No courier.php file exist inside config directory. You should publish vendor Xenon\MultiCourier\MultiCourierServiceProvider");
+            throw new ErrorException("No multicourier.php file exist inside config directory. You should publish vendor Xenon\MultiCourier\MultiCourierServiceProvider");
         }
 
         $existance = Storage::disk('local')->exists('pathao_bearer_token.json');
@@ -114,6 +114,56 @@ class Pathao extends AbstractProvider
         $response = $request->executeRequest();
 
         return $response->getData();
+    }
+
+    /**
+     * @return void
+     * @throws RequestException
+     * @throws Exception
+     */
+    private function generateToken(): void
+    {
+        $accessToken = $this->authorize();
+        $accessTokenArray = ['Bearer' . ' ' . $accessToken];
+        $accessTokenJson = json_encode($accessTokenArray);
+        try {
+            Storage::disk('local')->put('pathao_bearer_token.json', $accessTokenJson);
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
+    }
+
+    /**
+     * @return Request
+     * @throws RequestException
+     */
+    public function authorize()
+    {
+        $providerConfiguration = config('courier')['providers'][get_class($this)];
+        $params = [
+            'client_id' => $providerConfiguration['PATHAO_CLIENT_ID'],
+            'client_secret' => $providerConfiguration['PATHAO_CLIENT_SECRET'],
+            'username' => $providerConfiguration['PATHAO_USERNAME'],
+            'password' => $providerConfiguration['PATHAO_PASSWORD'],
+            'grant_type' => $providerConfiguration['PATHAO_GRANT_TYPE'],
+        ];
+
+        $request = new Request($this->getBaseUrl(), 'issue-token', 'post', [], $params);
+        try {
+            $response = $request->executeRequest();
+
+            if ($response->statusCode == 200) {
+                $jsonResponse = $response->response;
+                $jsonDecode = json_decode($jsonResponse);
+                return $jsonDecode->access_token;
+            } else {
+                throw new RequestException("Failed to authenticate pathao endpoint; Status Code " . $response->statusCode . ' ' . __CLASS__);
+
+            }
+        } catch (GuzzleException|RequestException $e) {
+            throw new RequestException($e->getMessage());
+        }
+
     }
 
     /**
@@ -190,55 +240,5 @@ class Pathao extends AbstractProvider
     function getOrders()
     {
         // TODO: Implement getOrders() method.
-    }
-
-    /**
-     * @return Request
-     * @throws RequestException
-     */
-    public function authorize()
-    {
-        $providerConfiguration = config('courier')['providers'][get_class($this)];
-        $params = [
-            'client_id' => $providerConfiguration['PATHAO_CLIENT_ID'],
-            'client_secret' => $providerConfiguration['PATHAO_CLIENT_SECRET'],
-            'username' => $providerConfiguration['PATHAO_USERNAME'],
-            'password' => $providerConfiguration['PATHAO_PASSWORD'],
-            'grant_type' => $providerConfiguration['PATHAO_GRANT_TYPE'],
-        ];
-
-        $request = new Request($this->getBaseUrl(), 'issue-token', 'post', [], $params);
-        try {
-            $response = $request->executeRequest();
-
-            if ($response->statusCode == 200) {
-                $jsonResponse = $response->response;
-                $jsonDecode = json_decode($jsonResponse);
-                return $jsonDecode->access_token;
-            } else {
-                throw new RequestException("Failed to authenticate pathao endpoint; Status Code " . $response->statusCode . ' ' . __CLASS__);
-
-            }
-        } catch (GuzzleException|RequestException $e) {
-            throw new RequestException($e->getMessage());
-        }
-
-    }
-
-    /**
-     * @return void
-     * @throws RequestException
-     * @throws Exception
-     */
-    private function generateToken(): void
-    {
-        $accessToken = $this->authorize();
-        $accessTokenArray = ['Bearer' . ' ' . $accessToken];
-        $accessTokenJson = json_encode($accessTokenArray);
-        try {
-            Storage::disk('local')->put('pathao_bearer_token.json', $accessTokenJson);
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage());
-        }
     }
 }
