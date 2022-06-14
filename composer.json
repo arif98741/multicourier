@@ -23,8 +23,7 @@
                 "Xenon\\MultiCourier\\MultiCourierServiceProvider"
             ],
             "aliases": {
-                "Courier": "MultiCourier",
-                "MultiCourier": "MultiCourier"
+                
             }
         }
     }
