@@ -24,7 +24,7 @@
             ],
             "aliases": {
                 "Courier": "MultiCourier",
-                "MultiCourier": "MultiCourier",
+                "MultiCourier": "MultiCourier"
             }
         }
     }
