@@ -113,7 +113,7 @@ $courier->setRequestEndpoint('cities/1/zone-list', []); //second param should be
 $response = $courier->send();
 </pre>
 
-### Methods
+# Available Methods to Interact with Provider's Api
 ### _getInstance()_
 ### _getConfig()_
 ### _setConfig()_
