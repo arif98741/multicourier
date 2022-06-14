@@ -42,22 +42,4 @@ abstract class AbstractProvider implements ProviderRoadmap
      */
     abstract public function errorException();
 
-    /**
-     * Return Report As Array
-     */
-    public function toArray(): array
-    {
-        return [
-
-        ];
-    }
-
-    /**
-     * Return Report As Json
-     * @deprecated
-     */
-    public function toJson()
-    {
-        return json_encode();
-    }
 }

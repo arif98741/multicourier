@@ -3,17 +3,16 @@
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static \Xenon\MultiCourier\SMS via(string $provider)
- * @method static mixed shoot(string $mobile, string $text)
+ * @method static \Xenon\MultiCourier\MultiCourier via(string $provider)
  *
- * @see \Xenon\MultiCourier\SMS
+ * @see \Xenon\MultiCourier\MultiCourier
  */
-class SMS extends Facade
+class MultiCourier extends Facade
 {
     /**
      * @return string
-     * @version v1.0.32
-     * @since v1.0.31
+     * @version v1.0.1
+     * @since v1.0.1
      */
     protected static function getFacadeAccessor(): string
     {

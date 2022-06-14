@@ -11,6 +11,7 @@
 
 namespace Xenon\MultiCourier;
 
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Xenon\MultiCourier\Log\Log;
 
@@ -20,19 +21,18 @@ class MultiCourierServiceProvider extends ServiceProvider
      * Register services.
      *
      * @return void
-     * @version v1.0.32
-     * @since v1.0.31
+     * @version v1.0.1
+     * @since v1.0.1
      */
     public function register()
     {
         $this->app->bind('MultiCourier', function () {
 
-            $provider = config('sms.default_provider');
-
+            $provider = Config::get('multicourier.default_provider');
             $sender = Courier::getInstance();
             $sender->setProvider($provider);
-            $sender->setConfig(config('sms.providers')[$provider]);
-            return new SMS($sender);
+            $sender->setConfig(config('multicourier.providers')[$provider]);
+            return new MultiCourier($sender);
         });
 
         $this->app->bind('MultiCourierLogger', function () {
@@ -49,13 +49,13 @@ class MultiCourierServiceProvider extends ServiceProvider
      * Bootstrap services.
      *
      * @return void
-     * @version v1.0.32
-     * @since v1.0.31
+     * @version v1.0.1
+     * @since v1.0.1
      */
     public function boot()
     {
         $this->publishes([
-            __DIR__ . '/Config/courier.php' => config_path('courier.php'),
+            __DIR__ . '/Config/multicourier.php' => config_path('multicourier.php'),
         ]);
 
 

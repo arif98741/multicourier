@@ -11,16 +11,26 @@
 
 namespace Xenon\MultiCourier;
 
-
 use Exception;
 use Xenon\MultiCourier\Facades\Logger;
-use Xenon\MultiCourier\Handler\ParameterException;
-use Xenon\MultiCourier\Handler\RenderException;
+use Xenon\MultiCourier\Handler\ErrorException;
 use Xenon\MultiCourier\Handler\RequestException;
 use Xenon\MultiCourier\Provider\AbstractProvider;
 
 class Courier
 {
+    /**
+     * @var null
+     */
+    private static $instance = null;
+    /**
+     * @var
+     */
+    public $requestEndpoint;
+    /**
+     * @var
+     */
+    public $environment = 'local';
     /**
      * @var AbstractProvider
      */
@@ -28,54 +38,19 @@ class Courier
     /**
      * @var
      */
-    /**
-     * @var
-     */
-    public $requestEndpoint;
-
-    /**
-     * @var
-     */
     private $config;
-
     /**
      * @var
      */
     private $params;
-
     /**
      * @var
      */
     private $headers;
-
-    public $environment;
-
     /**
      * @var
      */
     private $method;
-
-    /**
-     * @return mixed
-     */
-    public function getMethod()
-    {
-        return $this->method;
-    }
-
-    /**
-     * @param mixed $method
-     */
-    public function setMethod($method): void
-    {
-        $this->method = $method;
-    }
-
-    /**
-     * @var null
-     */
-    private static $instance = null;
-
 
     /**
      * This is the static method that controls the access to the singleton
@@ -98,9 +73,24 @@ class Courier
     /**
      * @return mixed
      */
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    /**
+     * @param mixed $method
+     */
+    public function setMethod($method): void
+    {
+        $this->method = $method;
+    }
+
+    /**
+     * @return mixed
+     */
     public function getConfig()
     {
-        //$providerConfiguration = config('courier')['providers'][get_class($this)];
         return $this->config;
     }
 
@@ -110,7 +100,7 @@ class Courier
      * @throws Exception
      * @since v1.0.0
      */
-    public function setConfig($config): Courier
+    public function setConfig(array $config): Courier
     {
         $this->config = $config;
         return $this;
@@ -148,30 +138,6 @@ class Courier
         $this->headers = $headers;
     }
 
-
-    /**
-     * Send Message Finally
-     * @throws ParameterException
-     * @throws RequestException
-     * @since v1.0.5
-     */
-    public function send()
-    {
-        if (empty($this->getRequestEndpoint())) {
-            $providerClass = get_class($this->provider);
-            throw  new RequestException("Api endpoint missing for $providerClass");
-        }
-
-
-        // $this->provider->errorException();
-
-        // $config = Config::get('sms');
-        //dd($config);
-        // $this->logGenerate($config, $response);
-
-        return $this->provider->sendRequest($this->getRequestEndpoint());
-    }
-
     /**
      * @return mixed
      */
@@ -183,6 +149,7 @@ class Courier
     /**
      * This method accept request endpoint
      * @param mixed $requestEndpoint
+     * @deprecated
      */
     public function setRequestEndpoint($requestEndpoint, array $params = []): void
     {
@@ -191,26 +158,6 @@ class Courier
             $this->setParams($params);
     }
 
-    /**
-     * @return mixed
-     * @since v1.0.0
-     */
-    public function getMessage()
-    {
-        return $this->message;
-    }
-
-    /**
-     * @param mixed $message
-     * @return Courier
-     * @since v1.0.0
-     */
-    public function setMessage($message = ''): Courier
-    {
-
-        $this->message = $message;
-        return self::getInstance();
-    }
 
     /**
      * @return mixed
@@ -223,37 +170,253 @@ class Courier
 
     /**
      * Return this class object
-     * @param $ProviderClass
-     * @param string|null $environment
+     * @param $providerClass
+     * @param string $environment
      * @return Courier
-     * @throws RenderException
+     * @throws ErrorException
      * @since v1.0.0
      */
-    public function setProvider($ProviderClass, string $environment = null): Courier
+    public function setProvider($providerClass, string $environment = 'local'): Courier
     {
 
         try {
-            if (!class_exists($ProviderClass)) {
-                throw new RenderException("Courier Provider '$ProviderClass' not found");
+            if (!class_exists($providerClass)) {
+                throw new ErrorException("Courier provider doesn't exist-  $providerClass");
             }
 
-            if (!is_subclass_of($ProviderClass, AbstractProvider::class)) {
-                throw new RenderException("Provider '$ProviderClass' is not a " . AbstractProvider::class);
+            if (!is_subclass_of($providerClass, AbstractProvider::class)) {
+                throw new ErrorException("Provider $providerClass is not a " . AbstractProvider::class);
             }
 
             $this->environment = $environment;
-        } catch (RenderException $exception) {
 
-            throw new RenderException($exception->getMessage());
+        } catch (ErrorException $exception) {
+
+            throw new ErrorException($exception->getMessage());
         }
 
-        $this->provider = new $ProviderClass($this);
+        $this->provider = $providerClass;
         return $this;
+    }
+
+    /**
+     * @return void
+     * @throws RequestException
+     * @since v1.0.1
+     */
+    public function getCities()
+    {
+        $providerObject = new $this->provider($this);
+        $this->methodNotException($providerObject, __FUNCTION__);
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @return mixed
+     * @throws RequestException
+     * @since v1.0.1
+     */
+    public function getThanas()
+    {
+        $providerObject = new $this->provider($this);
+        $this->methodNotException($providerObject, __FUNCTION__);
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @throws RequestException
+     * @since v1.0.1
+     */
+    public function trackOrder()
+    {
+        $providerObject = new $this->provider($this);
+
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @throws RequestException
+     * @since v1.0.1
+     */
+    public function trackChildOrder()
+    {
+        $providerObject = new $this->provider($this);
+
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @throws RequestException
+     * @since v1.0.1
+     */
+    public function getPackages()
+    {
+        $providerObject = new $this->provider($this);
+
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @throws RequestException
+     * @since v1.0.1
+     */
+    public function placeOrder()
+    {
+        $providerObject = new $this->provider($this);
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @throws RequestException
+     * @since v1.0.1
+     */
+    public function cancelOrder()
+    {
+        $providerObject = new $this->provider($this);
+
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @throws RequestException
+     * @since v1.0.1
+     */
+    public function cancelChildOrder()
+    {
+        $providerObject = new $this->provider($this);
+
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @return mixed
+     * @throws RequestException
+     */
+    public function fraudStatusCheck()
+    {
+        $providerObject = new $this->provider($this);
+
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @return mixed
+     * @throws RequestException
+     */
+    public function getAreas()
+    {
+        $providerObject = new $this->provider($this);
+
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @return mixed
+     * @throws RequestException
+     */
+    public function getPostCodes()
+    {
+        $providerObject = new $this->provider($this);
+
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @throws RequestException
+     */
+    public function getBranches()
+    {
+        $providerObject = new $this->provider($this);
+
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @throws RequestException
+     */
+    public function printLabel()
+    {
+        $providerObject = new $this->provider($this);
+
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+
+    /**
+     * @throws RequestException
+     */
+    public function boostSms()
+    {
+        $providerObject = new $this->provider($this);
+
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @throws RequestException
+     */
+    public function topupSms()
+    {
+        $providerObject = new $this->provider($this);
+
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @return mixed
+     * @throws RequestException
+     */
+    public function topTransactionStatus()
+    {
+        $providerObject = new $this->provider($this);
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @return mixed
+     * @throws RequestException
+     */
+    public function topupOtp()
+    {
+        $providerObject = new $this->provider($this);
+
+        $this->methodNotException($providerObject, __FUNCTION__);
+
+        return $providerObject->{__FUNCTION__}();
     }
 
     /**
      * @param $config
      * @param $response
+     * @deprecated
      */
     private function logGenerate($config, $response): void
     {
@@ -271,9 +434,7 @@ class Courier
             Logger::createLog([
                 'provider' => get_class($this->provider),
                 'request_json' => json_encode([
-                    'config' => $config['providers'][get_class($this->provider)],
-                    'mobile' => $this->getMobile(),
-                    'message' => $this->getMessage()
+                    'config' => $config['providers'][$this->provider],
                 ])
                 ,
                 'response_json' => json_encode($providerResponse)
@@ -281,4 +442,16 @@ class Courier
         }
     }
 
+    /**
+     * @param $providerObject
+     * @param $method
+     * @return void
+     * @throws RequestException
+     */
+    private function methodNotException($providerObject, $method): void
+    {
+        if (!method_exists($providerObject, $method)) {
+            throw new RequestException("Method " . $method . " does not applicable for $this->provider class");
+        }
+    }
 }

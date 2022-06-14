@@ -38,54 +38,6 @@ return [
             'API-KEY' => env('ECOURIER_API-KEY', ''),
             'API-SECRET' => env('ECOURIER_API-SECRET', ''),
             'USER-ID' => env('ECOURIER_USER-ID', ''),
-            'endpoints' => [
-                'city-list' => [
-                    'method' => 'post',
-                    'params' => ['city']
-                ],
-                'thana-list' => [
-                    'method' => 'post',
-                    'params' => ['city']
-                ],
-                'area-list' => [
-                    'method' => 'post',
-                    'params' => ['postcode']
-                ],
-                'postcode-list' => [
-                    'method' => 'post',
-                    'params' => ['city', 'thana']
-                ],
-                'branch-list' => [
-                    'method' => 'post',
-                    'params' => ['city', 'thana']
-                ],
-                'payment-status' => [
-                    'method' => 'post',
-                    'params' => []
-                ],
-                'packages' => [
-                    'method' => 'post',
-                    'params' => []
-                ],
-                'order-place' => [
-                    'method' => 'post',
-                    'params' => [
-                    ]
-                ],
-                'cancel-order' => [
-                    'method' => 'post',
-                    'params' => ['tracking', 'comment']
-                ],
-                'track' => [
-                    'method' => 'post',
-                    'params' => ['Product_id', 'ecr']
-                ],
-                'fraud-status-check' => [
-                    'method' => 'post',
-                    'params' => ['number']
-                ],
-
-            ]
         ],
         Pathao::class => [
             'PATHAO_CLIENT_ID' => env('PATHAO_CLIENT_ID', ''),
@@ -93,13 +45,6 @@ return [
             'PATHAO_USERNAME' => env('PATHAO_USERNAME', ''),
             'PATHAO_PASSWORD' => env('PATHAO_PASSWORD', ''),
             'PATHAO_GRANT_TYPE' => env('PATHAO_GRANT_TYPE', ''),
-            'endpoints' => [
-                'stores' => [
-                    'method' => 'get',
-                    'params' => []
-                ],
-
-            ]
         ],
     ]
 ];
