@@ -283,10 +283,78 @@ class Courier
      */
     public function placeOrder()
     {
-        echo '<pre>';
-        print_r(get_class_methods($this));
-        echo '</pre>';
-        die;
+
+        $providerObject = new $this->provider($this);
+
+        if (!method_exists($providerObject, __FUNCTION__)) {
+            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
+        }
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @throws RequestException
+     * @since v1.0.1
+     */
+    public function cancelOrder()
+    {
+        $providerObject = new $this->provider($this);
+
+        if (!method_exists($providerObject, __FUNCTION__)) {
+            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
+        }
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @return mixed
+     * @throws RequestException
+     */
+    public function fraudStatusCheck()
+    {
+        $providerObject = new $this->provider($this);
+
+        if (!method_exists($providerObject, __FUNCTION__)) {
+            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
+        }
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @return mixed
+     * @throws RequestException
+     */
+    public function getAreas()
+    {
+        $providerObject = new $this->provider($this);
+
+        if (!method_exists($providerObject, __FUNCTION__)) {
+            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
+        }
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    /**
+     * @return mixed
+     * @throws RequestException
+     */
+    public function getPostCodes()
+    {
+        $providerObject = new $this->provider($this);
+
+        if (!method_exists($providerObject, __FUNCTION__)) {
+            throw new RequestException("Method " . __FUNCTION__ . " not exist in $this->provider class");
+        }
+
+        return $providerObject->{__FUNCTION__}();
+    }
+
+    public function getBranches()
+    {
         $providerObject = new $this->provider($this);
 
         if (!method_exists($providerObject, __FUNCTION__)) {

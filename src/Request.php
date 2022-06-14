@@ -111,15 +111,17 @@ class Request
     /**
      * @return mixed
      */
-    public function getData(): mixed
+    public function getData(bool $array = false)
     {
+        if ($array)
+            return (array)$this->response;
         return $this->response;
     }
 
     /**
      * @return mixed
      */
-    public function getStatusCode(): mixed
+    public function getStatusCode(): int
     {
         return $this->statusCode;
     }

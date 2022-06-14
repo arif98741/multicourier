@@ -13,6 +13,7 @@ namespace Xenon\MultiCourier\Provider;
 
 use GuzzleHttp\Exception\GuzzleException;
 use Xenon\MultiCourier\Courier;
+use Xenon\MultiCourier\Handler\ErrorException;
 use Xenon\MultiCourier\Handler\ParameterException;
 use Xenon\MultiCourier\Handler\RequestException;
 use Xenon\MultiCourier\Request;
@@ -22,11 +23,11 @@ class ECourier extends AbstractProvider
     /**
      * @var string
      */
-    private string $base_url = 'https://staging.ecourier.com.bd/api/';
+    private $base_url = 'https://staging.ecourier.com.bd/api/';
     /**
      * @var mixed|string
      */
-    private string $environment;
+    private $environment;
 
     /**
      * ECourier constructor.
@@ -44,27 +45,6 @@ class ECourier extends AbstractProvider
         }
 
     }
-
-    /**
-     * @throws GuzzleException
-     * @throws RequestException
-     * @deprecated
-     * Send Request To Api and Send Message
-     */
-    public function sendRequest()
-    {
-        $endpoint = $this->senderObject->getRequestEndpoint();
-        $providerConfiguration = config('courier')['providers'][get_class($this)];
-        $headerConfig = [
-            'API-KEY' => $providerConfiguration['API-KEY'],
-            'API-SECRET' => $providerConfiguration['API-SECRET'],
-            'USER-ID' => $providerConfiguration['USER-ID'],
-        ];
-
-        $request = new Request($this->getBaseUrl(), $endpoint, 'post', $headerConfig, $this->senderObject->getParams());
-        return $request->executeRequest();
-    }
-
 
     /**
      * @return string
@@ -89,6 +69,20 @@ class ECourier extends AbstractProvider
     {
         return $this->environment;
     }
+
+    /**
+     * @throws GuzzleException
+     * @throws RequestException
+     * @deprecated
+     * Send Request To Api and Send Message
+     */
+    public function sendRequest()
+    {
+        $endpoint = $this->senderObject->getRequestEndpoint();
+        $request = new Request($this->getBaseUrl(), $endpoint, 'post', $this->getHeaderConfig(), $this->senderObject->getParams());
+        return $request->executeRequest();
+    }
+
 
     /**
      * @param mixed $environment
@@ -152,6 +146,55 @@ class ECourier extends AbstractProvider
      * @throws RequestException
      * @throws ParameterException
      */
+    public function getAreas(): Request
+    {
+        $params = $this->senderObject->getParams();
+        if (!is_array($params)) {
+            throw new ParameterException('Parameter postcode missing for getting area. Use setParams() for setting parameters ');
+        }
+        if (count($params) == 0 || !array_key_exists('postcode', $params)) {
+            throw new ParameterException('Parameter postcode missing for getting area.');
+        }
+
+        $request = new Request($this->getBaseUrl(), 'area-list', 'post', $this->getHeaderConfig(), $this->senderObject->getParams());
+        return $request->executeRequest();
+    }
+
+    /**
+     * @throws GuzzleException
+     * @throws RequestException
+     * @throws ParameterException
+     */
+    public function getPostCodes(): Request
+    {
+        $params = $this->senderObject->getParams();
+        if (!is_array($params)) {
+            throw new ParameterException('Parameter city or thana missing for getting area. Use setParams() for setting parameters ');
+        }
+        if (count($params) == 0 || !array_key_exists('city', $params) || !array_key_exists('thana', $params)) {
+            throw new ParameterException('Parameter city or thana missing for getting area.');
+        }
+
+        $request = new Request($this->getBaseUrl(), 'postcode-list', 'post', $this->getHeaderConfig(), $this->senderObject->getParams());
+        return $request->executeRequest();
+    }
+
+ /**
+     * @throws GuzzleException
+     * @throws RequestException
+  */
+    public function getBranches(): Request
+    {
+        $request = new Request($this->getBaseUrl(), 'branch-list', 'post', $this->getHeaderConfig(), $this->senderObject->getParams());
+        return $request->executeRequest();
+    }
+
+
+    /**
+     * @throws GuzzleException
+     * @throws RequestException
+     * @throws ParameterException
+     */
     public function trackOrder(): Request
     {
         $params = $this->senderObject->getParams();
@@ -178,8 +221,9 @@ class ECourier extends AbstractProvider
 
 
     /**
-     * @return mixed
+     * @return Request
      * @throws ParameterException
+     * @throws ErrorException
      */
     function placeOrder()
     {
@@ -192,11 +236,61 @@ class ECourier extends AbstractProvider
         }
 
         $request = new Request($this->getBaseUrl(), 'order-place', 'post', $this->getHeaderConfig(), $this->senderObject->getParams());
-        return $request->executeRequest();
+        try {
+            return $request->executeRequest();
+        } catch (GuzzleException|RequestException $e) {
+            throw new ErrorException($e->getMessage());
+        }
     }
 
     /**
-     * @return mixed
+     * @return Request
+     * @throws ParameterException
+     * @throws ErrorException
+     */
+    function cancelOrder()
+    {
+        $params = $this->senderObject->getParams();
+        if (!is_array($params)) {
+            throw new ParameterException('Parameter data array missing for tracking order. Use setParams() for setting parameters ');
+        }
+        if (count($params) == 0 || !array_key_exists('tracking', $params)) {
+            throw new ParameterException('Parameter tracking missing for cancelling order.');
+        }
+
+        $request = new Request($this->getBaseUrl(), 'cancel-order', 'post', $this->getHeaderConfig(), $this->senderObject->getParams());
+        try {
+            return $request->executeRequest();
+        } catch (GuzzleException|RequestException $e) {
+            throw new ErrorException($e->getMessage());
+        }
+    }
+
+    /**
+     * @return Request
+     * @throws ParameterException
+     * @throws ErrorException
+     */
+    function fraudStatusCheck(): Request
+    {
+        $params = $this->senderObject->getParams();
+        if (!is_array($params)) {
+            throw new ParameterException('Parameter data array missing for tracking order. Use setParams() for setting parameters ');
+        }
+        if (count($params) == 0 || !array_key_exists('number', $params)) {
+            throw new ParameterException('Parameter number missing for cancelling order.');
+        }
+
+        $request = new Request($this->getBaseUrl(), 'fraud-status-check', 'post', $this->getHeaderConfig(), $this->senderObject->getParams());
+        try {
+            return $request->executeRequest();
+        } catch (GuzzleException|RequestException $e) {
+            throw new ErrorException($e->getMessage());
+        }
+    }
+
+    /**
+     * @return void
      */
     function getOrders()
     {
@@ -216,11 +310,10 @@ class ECourier extends AbstractProvider
     {
         $providerConfiguration = $this->senderObject->getConfig();
 
-        $headerConfig = [
+        return [
             'API-KEY' => $providerConfiguration['API-KEY'],
             'API-SECRET' => $providerConfiguration['API-SECRET'],
             'USER-ID' => $providerConfiguration['USER-ID'],
         ];
-        return $headerConfig;
     }
 }
