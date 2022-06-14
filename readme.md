@@ -113,6 +113,31 @@ $courier->setRequestEndpoint('cities/1/zone-list', []); //second param should be
 $response = $courier->send();
 </pre>
 
+### Methods
+### _getInstance()_
+### _getConfig()_
+### _setConfig()_
+### _getParams()_
+### _setParams()_
+### _getProvider()_
+### _setProvider()_
+### _getCities()_
+### _getThanas()_
+### _trackOrder()_
+### _trackChildOrder()_
+### _getPackages()_
+### _placeOrder()_
+### _cancelOrder()_
+### _cancelChildOrder()_
+### _fraudStatusCheck()_
+### _getAreas()_
+### _getPostCodes()_
+### _getBranches()_
+### _printLabel()_
+### _boostSms()_
+### _topupSms()_
+### _topTransactionStatus()_
+### _topupOtp()_
 
 #### Currently Supported Courier Gateways
 
